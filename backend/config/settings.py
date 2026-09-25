@@ -21,14 +21,14 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'corsheaders',
     'django_filters',
-    'users',
-    'universities',
-    'applications',
-    'documents',
-    'materials',
-    'timelines',
-    'messages',
-    'analytics',
+    'users.apps.UsersConfig',
+    'universities.apps.UniversitiesConfig',
+    'applications.apps.ApplicationsConfig',
+    'documents.apps.DocumentsConfig',
+    'materials.apps.MaterialsConfig',
+    'timelines.apps.TimelinesConfig',
+    'messages.apps.MessagesConfig',
+    'analytics.apps.AnalyticsConfig',
 ]
 
 MIDDLEWARE = [

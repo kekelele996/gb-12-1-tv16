@@ -102,6 +102,15 @@ export const documentAPI = {
   getComments: (params?: any) => api.get('/documents/comments/', { params }),
   createComment: (data: any) => api.post('/documents/comments/', data),
   resolveComment: (id: number) => api.post(`/documents/comments/${id}/resolve/`),
+  rebindComment: (
+    id: number,
+    data: {
+      version: number;
+      start_position: number;
+      end_position: number;
+      highlighted_text: string;
+    }
+  ) => api.post(`/documents/comments/${id}/rebind/`, data),
 };
 
 export const materialAPI = {

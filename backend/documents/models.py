@@ -94,6 +94,15 @@ class DocumentVersion(models.Model):
         super().save(*args, **kwargs)
 
 class DocumentComment(models.Model):
+    # 批注绑定在某个版本的明确选中文字上。新版本保存后，未解决批注
+    # 自动转为 pending（待重新绑定），仅作为历史保留，不再作用于最新稿。
+    STATUS_ACTIVE = 'active'      # 已绑定到最新稿选中文字，当前有效
+    STATUS_PENDING = 'pending'    # 旧版本遗留，等待顾问重新绑定
+    STATUS_CHOICES = [
+        (STATUS_ACTIVE, '最新稿有效批注'),
+        (STATUS_PENDING, '待处理的旧批注'),
+    ]
+
     document = models.ForeignKey(
         Document,
         on_delete=models.CASCADE,
@@ -104,9 +113,10 @@ class DocumentComment(models.Model):
         DocumentVersion,
         on_delete=models.CASCADE,
         related_name='comments',
-        verbose_name='版本',
+        verbose_name='批注绑定版本',
         null=True,
-        blank=True
+        blank=True,
+        help_text='批注当前锚定的文书版本；重新绑定后指向最新版本'
     )
     author = models.ForeignKey(
         'users.CustomUser',
@@ -117,6 +127,12 @@ class DocumentComment(models.Model):
     start_position = models.IntegerField('起始位置', null=True, blank=True)
     end_position = models.IntegerField('结束位置', null=True, blank=True)
     highlighted_text = models.TextField('高亮文本', blank=True)
+    status = models.CharField(
+        '批注状态',
+        max_length=10,
+        choices=STATUS_CHOICES,
+        default=STATUS_PENDING,
+    )
     is_resolved = models.BooleanField('是否已解决', default=False)
     parent = models.ForeignKey(
         'self',
