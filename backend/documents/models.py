@@ -94,6 +94,16 @@ class DocumentVersion(models.Model):
         super().save(*args, **kwargs)
 
 class DocumentComment(models.Model):
+    STATUS_ACTIVE = 'active'
+    STATUS_OUTDATED = 'outdated'
+    STATUS_RESOLVED = 'resolved'
+
+    STATUS_CHOICES = [
+        (STATUS_ACTIVE, '生效中'),
+        (STATUS_OUTDATED, '待处理'),
+        (STATUS_RESOLVED, '已解决'),
+    ]
+
     document = models.ForeignKey(
         Document,
         on_delete=models.CASCADE,
@@ -117,6 +127,13 @@ class DocumentComment(models.Model):
     start_position = models.IntegerField('起始位置', null=True, blank=True)
     end_position = models.IntegerField('结束位置', null=True, blank=True)
     highlighted_text = models.TextField('高亮文本', blank=True)
+    status = models.CharField(
+        '状态',
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default=STATUS_ACTIVE,
+        help_text='生效中=绑定最新稿；待处理=旧稿批注，需顾问重新绑定后才生效；已解决'
+    )
     is_resolved = models.BooleanField('是否已解决', default=False)
     parent = models.ForeignKey(
         'self',
@@ -136,3 +153,8 @@ class DocumentComment(models.Model):
     
     def __str__(self):
         return f"{self.author.username} - {self.document.title}"
+
+    def save(self, *args, **kwargs):
+        # is_resolved 与 status 保持一致，避免两处状态不一致
+        self.is_resolved = (self.status == self.STATUS_RESOLVED)
+        super().save(*args, **kwargs)

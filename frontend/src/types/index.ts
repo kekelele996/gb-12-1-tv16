@@ -118,6 +118,8 @@ export interface Document {
   current_version: DocumentVersion | null;
   versions_count: number;
   comments_count: number;
+  active_comments_count: number;
+  outdated_comments_count: number;
   created_by: number | null;
   created_by_name: string | null;
   created_at: string;
@@ -138,21 +140,32 @@ export interface DocumentVersion {
   created_at: string;
 }
 
+export type DocumentCommentStatus = 'active' | 'outdated' | 'resolved';
+
 export interface DocumentComment {
   id: number;
   document: number;
   version: number | null;
+  version_number: number | null;
   author: number;
   author_name: string;
   content: string;
   start_position: number | null;
   end_position: number | null;
   highlighted_text: string;
+  status: DocumentCommentStatus;
+  status_display: string;
   is_resolved: boolean;
   parent: number | null;
   replies: DocumentComment[];
   created_at: string;
   updated_at: string;
+}
+
+export interface CommentLocateMatch {
+  start_position: number;
+  end_position: number;
+  context: string;
 }
 
 export interface MaterialItem {
